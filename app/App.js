@@ -23,20 +23,23 @@ class App extends Component {
 
   constructor () {
     super()
+    //set input as an empty string.
     this.state = {
       input: ''
     }
   }
 
+  //_closeModal is a function that we will pass down as a prop to our ViewImages page to close the modal.
   _closeModal () {
     this.props.navigator.pop()
   }
 
+  //set the state of our input variable so we can use it to create a new item in our Realm database
   _updateInput (input) {
     this.setState({ input })
   }
 
-  // Add item to Realm
+  // checks to see if we have anything other than an empty string in our input state, and if so it writes to the Realm database and creates a new item with the value of this.state.input
   _addItem () {
     if (this.state.input === '' ) return
     realm.write(() => {
@@ -44,7 +47,7 @@ class App extends Component {
     })
   }
 
-  //Delete item from Realm
+  //filters through our list of item and does a check based on the item name. It then deletes the item from Realm database using the realm.delete function. We forceUpdate to reset the state of our app.
   _deleteItem () {
     let itemToDelete =  favs.filtered('name = $0', name)
     realm.write(() => {
@@ -64,15 +67,18 @@ class App extends Component {
   }
 
   render () {
+    //map over our favs items and return a View with our favs mapped into an array stored in our favorites variable
     let favorites = _.map(favs, (f, i) => {
       return (
         <View key={i} style={style.favoriteButtonContainer}>
+        //a button to view the images for that item name
         <TouchableHighlight
           onPress={() => this._viewImages(f.name)}
           underlayColor='transparent'
           style={style.favorite}>
           <Text style={style.favoriteText}>{f.name}</Text>
         </TouchableHighlight>
+        //a button to delete the item.
         <TouchableHighlight
           onPress={() => this._deleteItem(f.name)}
           underlayColor='transparent'
